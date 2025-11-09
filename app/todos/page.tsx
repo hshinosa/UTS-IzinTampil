@@ -109,7 +109,7 @@ export default function TodosPage() {
       {/* Todos List */}
       {todos && todos.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          No todos yet. Click "Add Todo" to create your first todo!
+          No todos yet. Click &ldquo;Add Todo&rdquo; to create your first todo!
         </div>
       ) : (
         <div className="space-y-4">

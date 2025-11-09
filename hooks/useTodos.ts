@@ -11,11 +11,18 @@ async function fetchTodos(): Promise<TodoResponse[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch todos')
   }
-  const todos = await response.json()
-  return todos.map((todo: any) => ({
+  const todos = await response.json() as Array<{
+    id: number
+    title: string
+    description: string | null
+    completed: number | boolean
+    createdAt: string
+    updatedAt: string
+  }>
+  return todos.map((todo) => ({
     ...todo,
-    completed: todo.completed === 1 || todo.completed === true
-  }))
+    completed: (todo.completed as number) === 1 || (todo.completed as boolean) === true
+  })) as TodoResponse[]
 }
 
 async function createTodo(data: TodoInput): Promise<TodoResponse> {
@@ -31,11 +38,12 @@ async function createTodo(data: TodoInput): Promise<TodoResponse> {
     throw new Error('Failed to create todo')
   }
   
-  const todo = await response.json()
-  return {
-    ...todo,
-    completed: todo.completed === 1 || todo.completed === true
+  const rawTodo = await response.json()
+  const todo = {
+    ...rawTodo,
+    completed: (rawTodo.completed as number) === 1 || (rawTodo.completed as boolean) === true
   }
+  return todo as TodoResponse
 }
 
 async function updateTodo(id: number, data: UpdateTodoInput): Promise<TodoResponse> {
@@ -51,11 +59,12 @@ async function updateTodo(id: number, data: UpdateTodoInput): Promise<TodoRespon
     throw new Error('Failed to update todo')
   }
   
-  const todo = await response.json()
-  return {
-    ...todo,
-    completed: todo.completed === 1 || todo.completed === true
+  const rawTodo = await response.json()
+  const todo = {
+    ...rawTodo,
+    completed: (rawTodo.completed as number) === 1 || (rawTodo.completed as boolean) === true
   }
+  return todo as TodoResponse
 }
 
 async function deleteTodo(id: number): Promise<void> {
