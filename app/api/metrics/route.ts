@@ -1,13 +1,23 @@
 import { NextResponse } from "next/server";
 
+export type LogEntry = { time: string; message: string };
+export type MetricsData = {
+  uptime: string;
+  clusterStatus: string;
+  activeAlerts: number;
+  errorLogs: LogEntry[];
+};
+
 export async function GET() {
-  return NextResponse.json({
+  const data: MetricsData = {
     uptime: "99.9%",
     clusterStatus: "Healthy",
-    activeAlerts: 0,
+    activeAlerts: 2,
     errorLogs: [
-      { time: "2025-11-09T08:00:00Z", message: "Dummy log 1" },
-      { time: "2025-11-09T09:00:00Z", message: "Dummy log 2" }
-    ]
-  });
+      { time: "2025-11-09T10:00:00Z", message: "Error connecting to DB" },
+      { time: "2025-11-09T11:00:00Z", message: "Timeout on API request" },
+    ],
+  };
+
+  return NextResponse.json(data);
 }

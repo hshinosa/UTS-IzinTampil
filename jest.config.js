@@ -1,6 +1,12 @@
+/** @type {import('jest').Config} */
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'jest-environment-jsdom', // <-- pastikan ini
-  moduleDirectories: ['node_modules', 'components', 'app'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/tests/setupTests.ts"],
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1",
+  },
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+  },
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
