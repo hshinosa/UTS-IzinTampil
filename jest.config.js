@@ -22,9 +22,9 @@ const customJestConfig = {
     '!app/**/*.d.ts',
     '!app/**/layout.{js,jsx,ts,tsx}',
     '!app/**/loading.{js,jsx,ts,tsx}',
-    '!app/**/page.{js,jsx,ts,tsx}',
-    '!app/**/route.{js,jsx,ts,tsx}',
+    '!app/**/*.module.{css,scss}',
   ],
+  coverageReporters: ['lcov', 'text', 'text-summary', 'json'],
   // Module file extensions for importing modules
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   // Test file extensions

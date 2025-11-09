@@ -1,5 +1,8 @@
-// Simple test file to verify Jest setup is working
 describe('Basic Test Setup', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('should pass a simple test', () => {
     expect(true).toBe(true);
     expect(2 + 2).toBe(4);
@@ -15,17 +18,24 @@ describe('Basic Test Setup', () => {
   });
 
   test('should handle fetch mock', async () => {
-    global.fetch = jest.fn(() =>
+    const mockFetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       })
     );
 
-    const response = await fetch('/api/test');
-    const data = await response.json();
-    
-    expect(data.success).toBe(true);
-    expect(fetch).toHaveBeenCalledWith('/api/test');
+    const originalFetch = global.fetch;
+    global.fetch = mockFetch;
+
+    try {
+      const response = await fetch('/api/test');
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith('/api/test');
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });
