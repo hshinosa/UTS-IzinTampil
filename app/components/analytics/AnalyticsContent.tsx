@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import AdvancedCharts from './AdvancedCharts';
 
 interface AnalyticsData {
   totalTasks: number;
@@ -232,6 +233,9 @@ export default function AnalyticsContent({ data }: AnalyticsContentProps) {
           ))}
         </div>
       </div>
+
+      {/* Advanced Charts Section */}
+      <AdvancedCharts data={data} />
     </div>
   );
 }

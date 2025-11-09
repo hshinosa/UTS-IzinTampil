@@ -16,6 +16,11 @@ jest.mock('../../../app/components/analytics/AnalyticsSkeleton', () => ({
   default: 'MockAnalyticsSkeleton'
 }));
 
+jest.mock('../../../app/components/analytics/AdvancedCharts', () => ({
+  __esModule: true,
+  default: 'MockAdvancedCharts'
+}));
+
 describe('Analytics Components Index', () => {
   it('exports DateRangeFilter component', () => {
     expect(analyticsComponents.DateRangeFilter).toBeDefined();
@@ -32,18 +37,19 @@ describe('Analytics Components Index', () => {
     expect(analyticsComponents.AnalyticsSkeleton).toBe('MockAnalyticsSkeleton');
   });
 
-  it('exports exactly 3 components', () => {
+  it('exports exactly 4 components', () => {
     const exportedKeys = Object.keys(analyticsComponents);
-    expect(exportedKeys).toHaveLength(3);
-    expect(exportedKeys.sort()).toEqual(['AnalyticsContent', 'AnalyticsSkeleton', 'DateRangeFilter'].sort());
+    expect(exportedKeys).toHaveLength(4);
+    expect(exportedKeys.sort()).toEqual(['AdvancedCharts', 'AnalyticsContent', 'AnalyticsSkeleton', 'DateRangeFilter'].sort());
   });
 
   it('all exports are defined', () => {
-    const { DateRangeFilter, AnalyticsContent, AnalyticsSkeleton } = analyticsComponents;
+    const { DateRangeFilter, AnalyticsContent, AnalyticsSkeleton, AdvancedCharts } = analyticsComponents;
     
     expect(DateRangeFilter).toBeDefined();
     expect(AnalyticsContent).toBeDefined();
     expect(AnalyticsSkeleton).toBeDefined();
+    expect(AdvancedCharts).toBeDefined();
   });
 
   it('provides consistent export structure', () => {
@@ -53,5 +59,6 @@ describe('Analytics Components Index', () => {
     expect('DateRangeFilter' in exports).toBe(true);
     expect('AnalyticsContent' in exports).toBe(true);
     expect('AnalyticsSkeleton' in exports).toBe(true);
+    expect('AdvancedCharts' in exports).toBe(true);
   });
 });

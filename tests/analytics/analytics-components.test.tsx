@@ -16,6 +16,12 @@ jest.mock('../../app/components/Navbar', () => ({
   Navbar: () => <nav data-testid="navbar">Navbar</nav>
 }));
 
+// Mock AdvancedCharts to avoid recharts rendering issues in tests
+jest.mock('../../app/components/analytics/AdvancedCharts', () => ({
+  __esModule: true,
+  default: () => <div data-testid="advanced-charts">Advanced Charts</div>
+}));
+
 // Mock fetch for API calls
 global.fetch = jest.fn();
 

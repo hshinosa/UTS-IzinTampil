@@ -106,10 +106,13 @@ describe('AnalyticsContent Component', () => {
     
     // Check some months and their rates
     expect(screen.getByText('Jan')).toBeInTheDocument();
-    expect(screen.getByText('85%')).toBeInTheDocument();
+    // Use getAllByText for rates that might appear multiple times
+    const rateElements = screen.getAllByText('85%');
+    expect(rateElements.length).toBeGreaterThan(0);
     
     expect(screen.getByText('Mar')).toBeInTheDocument();
-    expect(screen.getByText('90%')).toBeInTheDocument();
+    const marRateElements = screen.getAllByText('90%');
+    expect(marRateElements.length).toBeGreaterThan(0);
   });
 
   it('renders daily activity section', () => {
