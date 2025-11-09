@@ -13,7 +13,7 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const { title, description, completed } = body
+    const { title, description, completed, priority } = body
 
     const db = getDb()
     
@@ -32,6 +32,10 @@ export async function PATCH(
     if (completed !== undefined) {
       updates.push('completed = ?')
       values.push(completed ? 1 : 0)
+    }
+    if (priority !== undefined) {
+      updates.push('priority = ?')
+      values.push(priority)
     }
     
     if (updates.length === 0) {

@@ -24,10 +24,11 @@ export function Statistics() {
     )
   }
 
-  const totalTasks = todos?.length || 0
-  const completedTasks = todos?.filter(todo => todo.completed).length || 0
+  const todosData = todos?.data || []
+  const totalTasks = todosData.length
+  const completedTasks = todosData.filter(todo => todo.completed).length
   const inProgressTasks = totalTasks - completedTasks
-  const pendingTasks = todos?.filter(todo => !todo.completed).length || 0
+  const pendingTasks = todosData.filter(todo => !todo.completed).length
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

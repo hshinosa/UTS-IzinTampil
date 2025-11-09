@@ -29,3 +29,39 @@ Content-Type: application/json
 
 ### Test DELETE todo 2
 DELETE http://localhost:3000/api/todos/2
+
+### Test Sprint 3: POST create todo with priority
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "title": "High Priority Todo",
+  "description": "This is a high priority task",
+  "priority": "HIGH"
+}
+
+### Test Sprint 3: GET todos with pagination
+GET http://localhost:3000/api/todos?page=1&limit=5
+
+### Test Sprint 3: GET todos with search
+GET http://localhost:3000/api/todos?search=High
+
+### Test Sprint 3: GET todos with priority filter
+GET http://localhost:3000/api/todos?priority=HIGH
+
+### Test Sprint 3: GET todos with status filter
+GET http://localhost:3000/api/todos?status=pending
+
+### Test Sprint 3: GET todos with date filter
+GET http://localhost:3000/api/todos?dateFrom=2025-01-01
+
+### Test Sprint 3: GET todos combined filters
+GET http://localhost:3000/api/todos?search=High&priority=HIGH&status=pending&page=1&limit=10
+
+### Test Sprint 3: PATCH update todo priority
+PATCH http://localhost:3000/api/todos/1
+Content-Type: application/json
+
+{
+  "priority": "LOW"
+}

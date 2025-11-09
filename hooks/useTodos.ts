@@ -1,28 +1,56 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { TodoInput, TodoResponse, UpdateTodoInput } from "@/lib/validations/todo"
+import { TodoInput, TodoResponse, UpdateTodoInput, TodosQuery, PaginatedTodosResponse } from "@/lib/validations/todo"
 import { toast } from "sonner"
 
 const API_URL = '/api/todos'
 
-async function fetchTodos(): Promise<TodoResponse[]> {
-  const response = await fetch(API_URL)
+async function fetchTodos(query?: TodosQuery): Promise<PaginatedTodosResponse> {
+  const searchParams = new URLSearchParams()
+  
+  if (query) {
+    if (query.page && query.page !== 1) searchParams.set('page', query.page.toString())
+    if (query.limit && query.limit !== 10) searchParams.set('limit', query.limit.toString())
+    if (query.search) searchParams.set('search', query.search)
+    if (query.priority && query.priority !== 'all') searchParams.set('priority', query.priority)
+    if (query.status && query.status !== 'all') searchParams.set('status', query.status)
+    if (query.dateFrom) searchParams.set('dateFrom', query.dateFrom)
+    if (query.dateTo) searchParams.set('dateTo', query.dateTo)
+  }
+  
+  const url = searchParams.toString() ? `${API_URL}?${searchParams.toString()}` : API_URL
+  const response = await fetch(url)
   if (!response.ok) {
     throw new Error('Failed to fetch todos')
   }
-  const todos = await response.json() as Array<{
-    id: number
-    title: string
-    description: string | null
-    completed: number | boolean
-    createdAt: string
-    updatedAt: string
-  }>
-  return todos.map((todo) => ({
-    ...todo,
-    completed: (todo.completed as number) === 1 || (todo.completed as boolean) === true
-  })) as TodoResponse[]
+  const result = await response.json() as {
+    data: Array<{
+      id: number
+      title: string
+      description: string | null
+      completed: number | boolean
+      priority: string
+      createdAt: string
+      updatedAt: string
+    }>
+    pagination: {
+      page: number
+      limit: number
+      total: number
+      pages: number
+      hasNext: boolean
+      hasPrev: boolean
+    }
+  }
+  
+  return {
+    data: result.data.map((todo) => ({
+      ...todo,
+      completed: (todo.completed as number) === 1 || (todo.completed as boolean) === true
+    })),
+    pagination: result.pagination
+  }
 }
 
 async function createTodo(data: TodoInput): Promise<TodoResponse> {
@@ -77,10 +105,10 @@ async function deleteTodo(id: number): Promise<void> {
   }
 }
 
-export function useTodos() {
+export function useTodos(query?: TodosQuery) {
   return useQuery({
-    queryKey: ['todos'],
-    queryFn: fetchTodos,
+    queryKey: ['todos', query],
+    queryFn: () => fetchTodos(query),
   })
 }
 
