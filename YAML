@@ -1,0 +1,35 @@
+# .github/workflows/ci.yml
+name: 🧪 CI / Test Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Vitest & Generate Coverage
+        # Menjalankan script yang diatur untuk menghasilkan report yang dikonfigurasi di atas
+        run: npm run test:coverage 
+
+      - name: Upload Coverage Artifact (for Dashboard API)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-vitest
+          path: coverage/vitest/
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      
+      # Di Sprint 1, ini mungkin dijalankan terhadap URL dummy
+      - name: Run Playwright E2E Tests
+        run: npx playwright test

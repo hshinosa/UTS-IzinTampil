@@ -1,0 +1,57 @@
+// frontend/src/components/TestingDashboard.jsx (Contoh React)
+import React, { useState, useEffect } from 'react';
+
+function TestingDashboard() {
+  const [builds, setBuilds] = useState([]);
+  const [coverage, setCoverage] = useState({});
+
+  useEffect(() => {
+    // 1. Ambil Status Builds
+    fetch('/api/status/builds')
+      .then(res => res.json())
+      .then(setBuilds);
+      
+    // 2. Ambil Status Coverage
+    fetch('/api/status/coverage')
+      .then(res => res.json())
+      .then(setCoverage);
+  }, []);
+
+  const getStatusColor = (status) => {
+    if (status === 'success') return 'text-green-500';
+    if (status === 'failure') return 'text-red-500';
+    return 'text-yellow-500';
+  };
+
+  return (
+    <div className="p-8">
+      <h2 className="text-2xl font-bold mb-4">Automation & Testing Dashboard</h2>
+
+      {/* Coverage Display */}
+      <div className="mb-6 p-4 border rounded-lg">
+        <h3 className="text-xl">Test Coverage Summary</h3>
+        <p>Lines: <span className="font-semibold">{coverage.lines}%</span></p>
+        <p>Branches: <span className="font-semibold">{coverage.branches}%</span></p>
+        <p className="text-sm text-gray-500">Last updated: {coverage.last_updated ? new Date(coverage.last_updated).toLocaleTimeString() : 'N/A'}</p>
+        {/* Di sini Anda bisa memasukkan komponen Chart.js/Recharts */}
+      </div>
+      
+      {/* Build Status Display */}
+      <h3 className="text-xl mb-3">Recent GitHub Builds (via API)</h3>
+      <ul className="space-y-2">
+        {builds.map(build => (
+          <li key={build.id} className="p-3 border rounded-md flex justify-between items-center">
+            <a href={build.url} target="_blank" className="font-medium hover:underline">
+              {build.branch} @ {build.commit}
+            </a>
+            <span className={`font-bold uppercase ${getStatusColor(build.status)}`}>
+              {build.status || 'pending'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TestingDashboard;

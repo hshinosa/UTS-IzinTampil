@@ -1,0 +1,27 @@
+# Snippet dari .github/workflows/preview.yml
+      - name: Set Variables & Template K8s Manifest
+        id: vars
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          NAMESPACE="pr-$PR_NUMBER"
+          IMAGE_TAG="${{ github.sha }}" # Menggunakan commit SHA
+
+          echo "NAMESPACE=$NAMESPACE" >> $GITHUB_OUTPUT
+          echo "PREVIEW_URL=https://$NAMESPACE.preview.domain.com" >> $GITHUB_OUTPUT
+          
+          # Lakukan penggantian placeholder menggunakan sed (di GHA runner)
+          sed -e "s|PR_NAMESPACE_PLACEHOLDER|$NAMESPACE|g" \
+              -e "s|IMAGE_TAG_PLACEHOLDER|$IMAGE_TAG|g" \
+              k8s/deployment-template.yaml > k8s/dynamic-deployment.yaml
+          
+      - name: Deploy to Kubernetes
+        # Pastikan K8s Context sudah di-set
+        run: |
+          kubectl apply -f k8s/dynamic-deployment.yaml
+          kubectl rollout status deployment/app-preview -n ${{ steps.vars.outputs.NAMESPACE }} --timeout=5m
+          
+      - name: Run E2E Test on Dynamic URL
+        run: npx playwright test
+        env:
+          # Memberikan URL yang baru dibuat ke Playwright
+          PLAYWRIGHT_BASE_URL: ${{ steps.vars.outputs.PREVIEW_URL }}

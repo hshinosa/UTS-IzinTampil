@@ -1,0 +1,19 @@
+# k8s/deployment-template.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: PR_NAMESPACE_PLACEHOLDER # Placeholder #1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-preview
+  namespace: PR_NAMESPACE_PLACEHOLDER
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-app
+        # Placeholder #2 (Image tag dinamis, biasanya SHA atau nomor PR)
+        image: your-registry.com/my-app:IMAGE_TAG_PLACEHOLDER 
+# ... tambahkan Service, Ingress, dll., dengan placeholder yang sama
