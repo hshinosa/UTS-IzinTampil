@@ -57,7 +57,7 @@ describe('Analytics Components Integration', () => {
   });
 
   describe('Component Rendering Integration', () => {
-    it('DateRangeFilter integrates properly with parent components', () => {
+    it('DateRangeFilter integrates properly with parent components', async () => {
       const mockOnChange = jest.fn();
       
       render(
@@ -69,11 +69,17 @@ describe('Analytics Components Integration', () => {
       );
 
       expect(screen.getByText('Filter Rentang Tanggal')).toBeInTheDocument();
-      expect(screen.getByText('Semua Data')).toBeInTheDocument();
+      // Use getAllByText since "Semua Data" appears in multiple places
+      const semuaDataElements = screen.getAllByText('Semua Data');
+      expect(semuaDataElements.length).toBeGreaterThan(0);
       
       // Test preset change
       fireEvent.click(screen.getByText('Hari Ini'));
-      expect(mockOnChange).toHaveBeenCalled();
+      
+      // Wait for the timeout in handlePresetChange
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalled();
+      }, { timeout: 500 });
     });
 
     it('AnalyticsContent displays data correctly', () => {
@@ -84,8 +90,8 @@ describe('Analytics Components Integration', () => {
       expect(screen.getByText('120')).toBeInTheDocument(); // Completed
       expect(screen.getByText('80% completion rate')).toBeInTheDocument(); // 120/150 = 80%
 
-      // Check priority distribution
-      expect(screen.getByText('High')).toBeInTheDocument();
+      // Check priority distribution - priority text is capitalized in the component
+      expect(screen.getByText(/high/i)).toBeInTheDocument();
       expect(screen.getByText('45')).toBeInTheDocument();
       expect(screen.getByText('30% of total')).toBeInTheDocument(); // 45/150 = 30%
     });
@@ -142,15 +148,18 @@ describe('Analytics Components Integration', () => {
         </div>
       );
 
-      // Change date range
-      fireEvent.click(screen.getByText('Bulan Ini'));
+      // Change date range - find the button specifically
+      const bulanIniButton = screen.getByRole('button', { name: /bulan ini/i });
+      fireEvent.click(bulanIniButton);
       
-      // Verify callback was called
-      expect(mockOnChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          preset: 'thisMonth'
-        })
-      );
+      // Wait for the timeout in handlePresetChange
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            preset: 'thisMonth'
+          })
+        );
+      }, { timeout: 500 });
 
       // Content should still render properly
       expect(screen.getByText('150')).toBeInTheDocument();

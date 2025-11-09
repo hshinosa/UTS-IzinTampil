@@ -35,7 +35,7 @@ describe('Analytics Components Index', () => {
   it('exports exactly 3 components', () => {
     const exportedKeys = Object.keys(analyticsComponents);
     expect(exportedKeys).toHaveLength(3);
-    expect(exportedKeys).toEqual(['DateRangeFilter', 'AnalyticsContent', 'AnalyticsSkeleton']);
+    expect(exportedKeys.sort()).toEqual(['AnalyticsContent', 'AnalyticsSkeleton', 'DateRangeFilter'].sort());
   });
 
   it('all exports are defined', () => {

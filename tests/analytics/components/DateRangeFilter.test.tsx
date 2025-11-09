@@ -79,9 +79,8 @@ describe('DateRangeFilter Component', () => {
     expect(screen.getByText('Kemarin')).toBeInTheDocument();
     expect(screen.getByText('7 Hari Terakhir')).toBeInTheDocument();
     expect(screen.getByText('30 Hari Terakhir')).toBeInTheDocument();
-    // Find buttons in the filter grid section
-    const filterSection = screen.getByText('Filter Cepat').closest('div');
-    expect(filterSection).toHaveTextContent('Bulan Ini');
+    // Use getByRole to find the button with specific name
+    expect(screen.getByRole('button', { name: /bulan ini/i })).toBeInTheDocument();
     expect(screen.getByText('Bulan Lalu')).toBeInTheDocument();
     expect(screen.getByText('Custom')).toBeInTheDocument();
   });
@@ -264,12 +263,17 @@ describe('DateRangeFilter Component', () => {
     const customButton = screen.getByText('Custom');
     fireEvent.click(customButton);
 
-    // Set dates using input type selectors since labels aren't properly associated
-    const dateInputs = screen.getAllByRole('textbox');
-    const startDateInput = dateInputs.find(input => input.getAttribute('type') === 'date');
-    const endDateInput = dateInputs.find((input, index) => 
-      input.getAttribute('type') === 'date' && index > 0
-    );
+    // Wait for modal to appear
+    await waitFor(() => {
+      expect(screen.getByText('Atur Tanggal Custom')).toBeInTheDocument();
+    });
+
+    // Find date inputs by type attribute
+    const dateInputs = document.querySelectorAll<HTMLInputElement>('input[type="date"]');
+    expect(dateInputs.length).toBeGreaterThan(0);
+    
+    const startDateInput = dateInputs[0];
+    const endDateInput = dateInputs[1];
     
     if (startDateInput && endDateInput) {
       fireEvent.change(startDateInput, { target: { value: '2024-01-01' } });
