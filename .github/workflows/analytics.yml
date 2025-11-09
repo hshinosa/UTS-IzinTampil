@@ -34,12 +34,19 @@ jobs:
         if [ -f coverage/lcov.info ]; then
           echo "✓ Coverage file exists"
           ls -lh coverage/lcov.info
-          echo "First 10 lines:"
-          head -10 coverage/lcov.info
+          echo "Coverage file content (first 20 lines):"
+          head -20 coverage/lcov.info
         else
           echo "✗ Coverage file not found!"
           exit 1
         fi
+
+    - name: Fix coverage paths for SonarCloud
+      run: |
+        sed -i 's|\\|/|g' coverage/lcov.info
+        echo "✓ Fixed Windows backslashes to forward slashes"
+        echo "Updated coverage file (first 20 lines):"
+        head -20 coverage/lcov.info
 
     - name: Build application
       run: npm run build
@@ -50,8 +57,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
+        projectBaseDir: .
         args: >
-          -Dsonar.projectKey=hshinosa_testRepo
+          -Dsonar.projectKey=hshinosa_UTS-IzinTampil
           -Dsonar.organization=hshino
           -Dsonar.sources=app
           -Dsonar.tests=tests
@@ -60,6 +68,7 @@ jobs:
           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
           -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
           -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js
+          -Dsonar.verbose=true
           
     - name: SonarCloud Report
       if: always()
