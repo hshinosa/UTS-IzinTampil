@@ -24,27 +24,42 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --legacy-peer-deps
 
     - name: Run tests with Jest
       run: npm run test:coverage
+
+    - name: Verify coverage file
+      run: |
+        if [ -f coverage/lcov.info ]; then
+          echo "✓ Coverage file exists"
+          ls -lh coverage/lcov.info
+          echo "First 10 lines:"
+          head -10 coverage/lcov.info
+        else
+          echo "✗ Coverage file not found!"
+          exit 1
+        fi
 
     - name: Build application
       run: npm run build
 
     - name: SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v6
+      uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=hshinosa_UTS-IzinTampil
+          -Dsonar.projectKey=hshinosa_testRepo
           -Dsonar.organization=hshino
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.sources=app
+          -Dsonar.tests=tests
+          -Dsonar.exclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js,**/node_modules/**,**/.next/**,**/coverage/**,**/out/**
+          -Dsonar.test.inclusions=tests/**/*.test.ts,tests/**/*.test.tsx,tests/**/*.test.js
           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-          -Dsonar.sources=.
-          -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx
+          -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+          -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js
           
     - name: SonarCloud Report
       if: always()
