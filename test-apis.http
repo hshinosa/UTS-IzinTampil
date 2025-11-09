@@ -1,0 +1,43 @@
+### Test GET all todos
+GET http://localhost:3000/api/todos
+
+### Test POST create todo
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "title": "Test Todo 1",
+  "description": "This is a test todo item"
+}
+
+### Test POST todo without required title
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "description": "This should fail - no title provided"
+}
+
+### Test PATCH update todo (replace :id with actual todo id)
+PATCH http://localhost:3000/api/todos/:id
+Content-Type: application/json
+
+{
+  "title": "Updated Todo Title",
+  "completed": true,
+  "description": "Updated description"
+}
+
+### Test DELETE todo (replace :id with actual todo id)
+DELETE http://localhost:3000/api/todos/:id
+
+### Test PATCH non-existent todo
+PATCH http://localhost:3000/api/todos/nonexistent-id
+Content-Type: application/json
+
+{
+  "completed": true
+}
+
+### Test DELETE non-existent todo
+DELETE http://localhost:3000/api/todos/nonexistent-id

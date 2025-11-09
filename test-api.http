@@ -1,0 +1,31 @@
+### Test GET all todos
+GET http://localhost:3000/api/todos
+
+### Test POST create todo
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "title": "Todo from API test",
+  "description": "This todo was created via API test"
+}
+
+### Test POST todo without title (should fail)
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "description": "This should fail - no title provided"
+}
+
+### Test PATCH update todo 1
+PATCH http://localhost:3000/api/todos/1
+Content-Type: application/json
+
+{
+  "title": "Updated Todo 1",
+  "completed": true
+}
+
+### Test DELETE todo 2
+DELETE http://localhost:3000/api/todos/2
