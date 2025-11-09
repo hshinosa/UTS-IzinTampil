@@ -36,9 +36,9 @@ const mockAnalyticsData = {
     { priority: 'low', count: 30 }
   ],
   tasksByDate: [
-    { date: '2024-01-01', completed: 10, created: 12 },
-    { date: '2024-01-02', completed: 8, created: 10 },
-    { date: '2024-01-03', completed: 15, created: 8 }
+    { date: '1 Jan', completed: 10, created: 12 },
+    { date: '2 Jan', completed: 8, created: 10 },
+    { date: '3 Jan', completed: 15, created: 8 }
   ],
   completionRateByMonth: [
     { month: 'Jan', rate: 88 },

@@ -210,10 +210,7 @@ export default function AnalyticsContent({ data }: AnalyticsContentProps) {
             <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
               <div className="flex items-center space-x-3">
                 <div className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[80px]">
-                  {new Date(day.date).toLocaleDateString('id-ID', { 
-                    day: 'numeric', 
-                    month: 'short' 
-                  })}
+                  {day.date}
                 </div>
                 <div className="flex space-x-4">
                   <div className="flex items-center space-x-1">

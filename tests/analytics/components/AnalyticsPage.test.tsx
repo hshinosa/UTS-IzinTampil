@@ -60,7 +60,7 @@ const mockAnalyticsData = {
     { priority: 'low', count: 20 }
   ],
   tasksByDate: [
-    { date: '2024-01-01', completed: 5, created: 8 }
+    { date: '1 Jan', completed: 5, created: 8 }
   ],
   completionRateByMonth: [
     { month: 'Jan', rate: 85 }

@@ -39,11 +39,11 @@ const mockAnalyticsData = {
     { priority: 'low', count: 30 }
   ],
   tasksByDate: [
-    { date: '2024-01-01', completed: 10, created: 12 },
-    { date: '2024-01-02', completed: 8, created: 10 },
-    { date: '2024-01-03', completed: 15, created: 8 },
-    { date: '2024-01-04', completed: 12, created: 14 },
-    { date: '2024-01-05', completed: 9, created: 11 }
+    { date: '1 Jan', completed: 10, created: 12 },
+    { date: '2 Jan', completed: 8, created: 10 },
+    { date: '3 Jan', completed: 15, created: 8 },
+    { date: '4 Jan', completed: 12, created: 14 },
+    { date: '5 Jan', completed: 9, created: 11 }
   ],
   completionRateByMonth: [
     { month: 'Jan', rate: 85 },
@@ -221,7 +221,7 @@ describe('AdvancedCharts Component', () => {
   it('handles single data point scenarios', () => {
     const singlePointData = {
       ...mockAnalyticsData,
-      tasksByDate: [{ date: '2024-01-01', completed: 5, created: 8 }],
+      tasksByDate: [{ date: '1 Jan', completed: 5, created: 8 }],
       completionRateByMonth: [{ month: 'Jan', rate: 85 }]
     };
 
@@ -265,8 +265,8 @@ describe('AdvancedCharts Component', () => {
     const zeroEfficiencyData = {
       ...mockAnalyticsData,
       tasksByDate: [
-        { date: '2024-01-01', completed: 0, created: 0 },
-        { date: '2024-01-02', completed: 5, created: 0 } // created = 0 should not cause division by zero
+        { date: '1 Jan', completed: 0, created: 0 },
+        { date: '2 Jan', completed: 5, created: 0 } // created = 0 should not cause division by zero
       ]
     };
 
@@ -282,9 +282,9 @@ describe('AdvancedCharts Component', () => {
     const efficiencyCard = screen.getByText('Efficiency Rate').closest('div');
     const peakCard = screen.getByText('Peak Performance').closest('div');
 
-    expect(avgCard).toHaveClass('bg-gradient-to-r', 'from-blue-500', 'to-blue-600');
-    expect(efficiencyCard).toHaveClass('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-600');
-    expect(peakCard).toHaveClass('bg-gradient-to-r', 'from-violet-500', 'to-violet-600');
+    expect(avgCard).toHaveClass('bg-gradient-to-r', 'from-blue-600', 'to-blue-700');
+    expect(efficiencyCard).toHaveClass('bg-gradient-to-r', 'from-green-600', 'to-emerald-600');
+    expect(peakCard).toHaveClass('bg-gradient-to-r', 'from-purple-600', 'to-pink-600');
   });
 
   it('renders icons for each chart section', () => {

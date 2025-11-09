@@ -50,46 +50,62 @@ const CHART_COLORS = [
 ];
 
 export default function AdvancedCharts({ data }: AdvancedChartsProps) {
+  // Validate data to prevent errors
+  if (!data) {
+    return (
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+        <p className="text-yellow-800 dark:text-yellow-200">No analytics data available</p>
+      </div>
+    );
+  }
+
   // Transform data for different chart types
   const getTaskStatusData = () => [
-    { name: 'Completed', value: data.completedTasks, color: '#10b981' },
-    { name: 'In Progress', value: data.inProgressTasks, color: '#f59e0b' },
-    { name: 'Pending', value: data.pendingTasks, color: '#ef4444' }
+    { name: 'Completed', value: data.completedTasks || 0, color: '#10b981' },
+    { name: 'In Progress', value: data.inProgressTasks || 0, color: '#f59e0b' },
+    { name: 'Pending', value: data.pendingTasks || 0, color: '#ef4444' }
   ];
 
   const getPriorityData = () => 
     data.tasksByPriority?.map(item => ({
       name: item.priority.charAt(0).toUpperCase() + item.priority.slice(1),
-      value: item.count,
+      value: item.count || 0,
       color: PRIORITY_COLORS[item.priority as keyof typeof PRIORITY_COLORS] || '#6b7280'
     })) || [];
 
   const getTrendData = () => 
     data.tasksByDate?.slice(-30).map(item => ({
-      date: new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
-      completed: item.completed,
-      created: item.created,
-      total: item.completed + item.created,
-      efficiency: item.created > 0 ? Math.round((item.completed / item.created) * 100) : 0
+      date: item.date, // Already formatted as "1 Nov" from API
+      completed: item.completed || 0,
+      created: item.created || 0,
+      total: (item.completed || 0) + (item.created || 0),
+      efficiency: (item.created || 0) > 0 ? Math.round(((item.completed || 0) / (item.created || 0)) * 100) : 0
     })) || [];
 
   const getMonthlyData = () => 
     data.completionRateByMonth?.map(item => ({
       month: item.month,
-      rate: item.rate,
+      rate: item.rate || 0,
       target: 80 // Target completion rate
     })) || [];
 
   const getProductivityData = () => {
     const trendData = getTrendData();
-    return trendData.map((item, index) => ({
-      day: item.date,
-      productivity: item.efficiency,
-      volume: item.total,
-      smoothed: trendData
-        .slice(Math.max(0, index - 2), index + 3)
-        .reduce((sum, d) => sum + d.efficiency, 0) / Math.min(5, index + 3)
-    }));
+    if (!trendData || trendData.length === 0) return [];
+    
+    return trendData.map((item, index) => {
+      const windowData = trendData.slice(Math.max(0, index - 2), index + 3);
+      const avgEfficiency = windowData.length > 0 
+        ? windowData.reduce((sum, d) => sum + (d.efficiency || 0), 0) / windowData.length 
+        : 0;
+      
+      return {
+        day: item.date,
+        productivity: item.efficiency || 0,
+        volume: item.total || 0,
+        smoothed: Math.round(avgEfficiency)
+      };
+    });
   };
 
   // Custom tooltip components
@@ -157,8 +173,24 @@ export default function AdvancedCharts({ data }: AdvancedChartsProps) {
   const monthlyData = getMonthlyData();
   const productivityData = getProductivityData();
 
+  // Show message if no data available
+  const hasNoData = !trendData || trendData.length === 0;
+
   return (
     <div className="space-y-8">
+      {hasNoData && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <div className="flex items-center">
+            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-blue-800 dark:text-blue-200">
+              No task activity data available for the selected period. Try selecting a different date range.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Task Status Overview - Pie Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -389,28 +421,49 @@ export default function AdvancedCharts({ data }: AdvancedChartsProps) {
 
       {/* Chart Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Average Daily Tasks</h4>
-          <p className="text-3xl font-bold">
-            {trendData.length > 0 ? Math.round(trendData.reduce((sum, item) => sum + item.total, 0) / trendData.length) : 0}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white shadow-lg">
+          <h4 className="text-lg font-semibold mb-2 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Average Daily Tasks
+          </h4>
+          <p className="text-4xl font-bold">
+            {trendData && trendData.length > 0 
+              ? Math.round(trendData.reduce((sum, item) => sum + (item.total || 0), 0) / trendData.length) 
+              : 0}
           </p>
-          <p className="text-blue-100 text-sm mt-1">Tasks per day</p>
+          <p className="text-blue-100 text-sm mt-2">Tasks per day</p>
         </div>
         
-        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Efficiency Rate</h4>
-          <p className="text-3xl font-bold">
-            {productivityData.length > 0 ? Math.round(productivityData.reduce((sum, item) => sum + item.productivity, 0) / productivityData.length) : 0}%
+        <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg p-6 text-white shadow-lg">
+          <h4 className="text-lg font-semibold mb-2 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            Efficiency Rate
+          </h4>
+          <p className="text-4xl font-bold">
+            {productivityData && productivityData.length > 0 
+              ? Math.round(productivityData.reduce((sum, item) => sum + (item.productivity || 0), 0) / productivityData.length) 
+              : 0}%
           </p>
-          <p className="text-emerald-100 text-sm mt-1">Completion efficiency</p>
+          <p className="text-green-100 text-sm mt-2">Completion efficiency</p>
         </div>
         
-        <div className="bg-gradient-to-r from-violet-500 to-violet-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Peak Performance</h4>
-          <p className="text-3xl font-bold">
-            {monthlyData.length > 0 ? Math.max(...monthlyData.map(m => m.rate)) : 0}%
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white shadow-lg">
+          <h4 className="text-lg font-semibold mb-2 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            Peak Performance
+          </h4>
+          <p className="text-4xl font-bold">
+            {monthlyData && monthlyData.length > 0 
+              ? Math.max(...monthlyData.map(m => m.rate || 0)) 
+              : 0}%
           </p>
-          <p className="text-violet-100 text-sm mt-1">Best monthly rate</p>
+          <p className="text-purple-100 text-sm mt-2">Best monthly rate</p>
         </div>
       </div>
     </div>
