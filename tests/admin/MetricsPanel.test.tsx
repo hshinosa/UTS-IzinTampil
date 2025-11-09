@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import MetricsPanel from "../../app/components/MetricsPanel";
+import {MetricsPanel} from "../../app/components/MetricsPanel";
 
 describe("MetricsPanel", () => {
   it("renders metrics data correctly", () => {

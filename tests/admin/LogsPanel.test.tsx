@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import LogsPanel from "../../app/components/LogsPanel";
+import {LogsPanel} from "../../app/components/LogsPanel";
 
 describe("LogsPanel", () => {
   it("renders error logs", () => {
