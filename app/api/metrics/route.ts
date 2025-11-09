@@ -1,23 +1,32 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export type LogEntry = { time: string; message: string };
+
 export type MetricsData = {
-  uptime: string;
-  clusterStatus: string;
-  activeAlerts: number;
-  errorLogs: LogEntry[];
+    appHealth: string;
+    uptime: number;
+    requests: number;
+    errorLogs: LogEntry[];
 };
 
 export async function GET() {
-  const data: MetricsData = {
-    uptime: "99.9%",
-    clusterStatus: "Healthy",
-    activeAlerts: 2,
-    errorLogs: [
-      { time: "2025-11-09T10:00:00Z", message: "Error connecting to DB" },
-      { time: "2025-11-09T11:00:00Z", message: "Timeout on API request" },
-    ],
-  };
+    // Ambil 10 error log terbaru
+    const errorLogs = await prisma.errorLog.findMany({
+        orderBy: { time: "desc" },
+        take: 10,
+    });
 
-  return NextResponse.json(data);
+    const data: MetricsData = {
+        appHealth: "ok",
+        uptime: process.uptime() * 1000,
+        requests: 123, // bisa diganti logika real jika tersedia
+        errorLogs: errorLogs.map((e: { time: Date; message: string }): LogEntry => ({
+            time: e.time.toISOString(),
+            message: e.message,
+        })),
+
+    };
+
+    return NextResponse.json(data);
 }

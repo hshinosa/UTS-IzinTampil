@@ -6,15 +6,23 @@ interface LogsPanelProps {
 
 export default function LogsPanel({ logs }: LogsPanelProps) {
   return (
-    <div className="p-4 border rounded bg-white dark:bg-gray-800">
-      <h2 className="text-xl font-semibold mb-2">Error Logs</h2>
-      <ul>
-        {logs.map((log, idx) => (
-          <li key={idx}>
-            {log.time} - {log.message}
-          </li>
-        ))}
-      </ul>
+    
+    <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        Error Logs
+      </h1>
+      <div className="max-h-96 overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+        {logs.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">No logs available.</p>
+        ) : (
+          logs.map((log, index) => (
+            <div key={index} className="py-2">
+              <p className="text-sm text-gray-400">{log.time}</p>
+              <p className="text-gray-900 dark:text-white">{log.message}</p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

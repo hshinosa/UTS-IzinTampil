@@ -1,0 +1,24 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Metrics {
+  id           Int      @id @default(autoincrement())
+  appHealth    String   @default("ok")
+  uptime       Int      @default(0)
+  requests     Int      @default(0)
+  clusterStatus String  @default("running")
+  activeAlerts Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model ErrorLog {
+  id      Int      @id @default(autoincrement())
+  time    DateTime @default(now())
+  message String
+}
