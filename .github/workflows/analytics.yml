@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 1302220079_Hashfi ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+
+    - name: Run tests with Jest
+      run: npm run test:coverage
+
+    - name: Verify coverage file
+      run: |
+        if [ -f coverage/lcov.info ]; then
+          echo "✓ Coverage file exists"
+          ls -lh coverage/lcov.info
+          echo "Coverage file content (first 20 lines):"
+          head -20 coverage/lcov.info
+        else
+          echo "✗ Coverage file not found!"
+          exit 1
+        fi
+
+    - name: Fix coverage paths for SonarCloud
+      run: |
+        sed -i 's|\\|/|g' coverage/lcov.info
+        echo "✓ Fixed Windows backslashes to forward slashes"
+        echo "Updated coverage file (first 20 lines):"
+        head -20 coverage/lcov.info
+
+    - name: Build application
+      run: npm run build
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.projectKey=hshinosa_UTS-IzinTampil
+          -Dsonar.organization=hshino
+          -Dsonar.sources=app
+          -Dsonar.tests=tests
+          -Dsonar.exclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js,**/node_modules/**,**/.next/**,**/coverage/**,**/out/**
+          -Dsonar.test.inclusions=tests/**/*.test.ts,tests/**/*.test.tsx,tests/**/*.test.js
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+          -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+          -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js
+          -Dsonar.verbose=true
+          
+    - name: SonarCloud Report
+      if: always()
+      run: |
+        echo "SonarCloud analysis completed"
+        echo "Visit project page for detailed results"
