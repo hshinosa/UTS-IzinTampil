@@ -1,4 +1,4 @@
-name: CI for A1 - Dashboard
+name: CI Pipeline Dhafa Arrizki Gusman 1302210042
 
 on:
   push:
